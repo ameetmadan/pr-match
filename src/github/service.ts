@@ -314,7 +314,7 @@ async function resolveDeployment(repository: Repository, pin: Pin): Promise<Depl
     if (pin.environment) return deployment.environment.toLowerCase() === pin.environment.toLowerCase() && !deployment.transient_environment
     return deployment.production_environment || (!deployment.transient_environment && deployment.environment.toLowerCase() === 'production')
   })
-  const candidates = await mapWithLimit(eligible.slice(0, 20), 3, async (deployment) => {
+  const candidates = await mapWithLimit(eligible, 3, async (deployment) => {
     const statuses = await requestAll<GitHubDeploymentStatus>(
       repository.connectionId,
       `/repos/${encodeURIComponent(repository.owner)}/${encodeURIComponent(repository.name)}/deployments/${deployment.id}/statuses?per_page=100`,
@@ -329,8 +329,7 @@ async function resolveDeployment(repository: Repository, pin: Pin): Promise<Depl
       latestStatus: latest ? { state: latest.state, url: latest.environment_url, environment: latest.environment, createdAt: latest.created_at } : null,
     }
   })
-  const result = selectProductionDeployment(candidates, pin.environment)
-  return eligible.length > 20 && !result.url ? { ...result, error: 'More than 20 deployments need review. Choose an environment or add a manual link.' } : result
+  return selectProductionDeployment(candidates, pin.environment)
 }
 
 function manualDeployment(pin: Pin, error: string | null): DeploymentLink {
