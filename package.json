@@ -14,7 +14,7 @@
     "vite": "8.3.2"
   },
   "devDependencies": {
-    "@types/chrome": "0.3.4",
+    "@types/chrome": "0.3.7",
     "@types/node": "^26.6.3",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
